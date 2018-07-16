@@ -12,7 +12,7 @@ const userRouter = require("./users");
 
 const app = express();
 userRouter(app);
-// const request = supertest(app);
+const request = supertest(app);
 
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
@@ -22,18 +22,16 @@ beforeAll(async () => {
   await mongoose.connect(uri);
 });
 
-test("GET /users will return the list of users successfully", () => {
-  expect(1).toBe(1);
-
-  // const response = await request.get("/users");
-  // expect(response.status).toBe(200);
-  // expect(response.body.message).toEqual(
-  //   "List of users retrieved successfully"
-  // );
-  // expect(response.body.users).toBeInstanceOf(Array);
-
-  // const users = await User.find();
-  // console.log(users.length);
+test("GET /users will return the list of users successfully", async () => {
+  const response = await request.get("/users");
+  expect(response.status).toBe(200);
+  expect(response.body.message).toEqual(
+    "List of users retrieved successfully"
+  );
+  expect(response.body.users).toBeInstanceOf(Array);
+  
+  const users = await User.find();
+  expect(response.body.users).toEqual(users);
 });
 
 /* Mongo Memory Server Test Setup */

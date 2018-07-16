@@ -4,11 +4,11 @@ const swaggerDocument = require("./swagger.json");
 
 const mongoose = require('mongoose');
 
-// const connectionOptions = {
-//   useNewUrlParser: true
-// };
-// mongoose.connect(process.env.MONGODB_URI, connectionOptions);
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/express-stock-prices');
+const connectionOptions = {
+  useNewUrlParser: true
+};
+mongoose.connect(process.env.MONGODB_URI, connectionOptions);
+// mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/express-stock-prices');
 
 const db = mongoose.connection;
 db.on("error", error =>
