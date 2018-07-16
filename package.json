@@ -2,7 +2,9 @@
   "name": "project-express-stock",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "engine": {
+    "node": "10.x.x"
+  },
   "scripts": {
     "start": "node server.js",
     "start:dev": "npx nodemon server.js",
