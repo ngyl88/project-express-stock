@@ -1,0 +1,286 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Express Stocks API"
+  },
+  "servers": [
+    {
+      "url": "https://express-stock-30545.herokuapp.com"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Hello Message",
+        "tags": ["Test"],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "String",
+                  "example": {
+                    "message": "Hello from Stock API!"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/solarPV/list": {
+      "get": {
+        "summary": "List all solar PV installation data from year 2008 to 2015",
+        "tags": ["solarPV installation"],
+        "responses": {
+          "200": {
+            "description": "An array of solar PV installation data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "example": {
+                      "year": "2008",
+                      "ura_planning_region": "Overall",
+                      "residential_status": "Residential",
+                      "number_of_solar_pv_installations": "24",
+                      "installed_capacity": "245.7",
+                      "percentage_share_of_total_installed_capacity": "88.2"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/solarPV/search": {
+      "get": {
+        "summary": "Search all available solar PV installation data",
+        "tags": ["solarPV installation"],
+        "parameters": [
+          {
+            "name": "ura_planning_region",
+            "in": "query",
+            "description": "The region to retrieve",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Overall",
+                "Central",
+                "East",
+                "North-East",
+                "North",
+                "West"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of matching solar PV installation data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "year": { "type": "string" },
+                      "ura_planning_region": { "type": "string" },
+                      "residential_status": { "type": "string" },
+                      "number_of_solar_pv_installations": { "type": "string" },
+                      "installed_capacity": { "type": "string" },
+                      "percentage_share_of_total_installed_capacity": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": [
+                    {
+                      "year": "2008",
+                      "ura_planning_region": "Overall",
+                      "residential_status": "Non-Residential",
+                      "number_of_solar_pv_installations": "24",
+                      "installed_capacity": "245.7",
+                      "percentage_share_of_total_installed_capacity": "88.2"
+                    },
+                    {
+                      "year": "2008",
+                      "ura_planning_region": "Overall",
+                      "residential_status": "Residential",
+                      "number_of_solar_pv_installations": "6",
+                      "installed_capacity": "33",
+                      "percentage_share_of_total_installed_capacity": "11.8"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/solarPV/{year}": {
+      "get": {
+        "summary": "List all solar PV installation data for a year",
+        "tags": ["solarPV installation"],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "description":
+              "The year of the information to retrieve, a valid year from 2008 to 2015 inclusive",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "example": {
+                      "year": "2008",
+                      "ura_planning_region": "Overall",
+                      "residential_status": "Residential",
+                      "number_of_solar_pv_installations": "24",
+                      "installed_capacity": "245.7",
+                      "percentage_share_of_total_installed_capacity": "88.2"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/solarPV": {
+      "post": {
+        "summary": "Create a solart PV installation data",
+        "tags": ["Coming soon..."],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a solart PV installation record",
+        "tags": ["Coming soon..."],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The id of the resource to update",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated fields for resource",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "id": 2,
+                  "name": "something"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 5,
+                    "name": "updated name"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/kindergarten": {
+      "get": {
+        "summary": "Query kindergarten incidental charges data",
+        "tags": ["kindergarten"],
+        "parameters": [
+          {
+            "name": "frequency",
+            "in": "query",
+            "description": "The frequency of the incidental charges",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["Ad-hoc", "Anually"]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of resource objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": "Hi from Kindergarten Router!"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/kindergarten/list": {
+      "get": {
+        "summary": "List all kindergarten incidental charges",
+        "tags": ["kindergarten"],
+        "responses": {
+          "200": {
+            "description": "List of resource objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "example": {
+                      "centre_code": "EB0001",
+                      "centre_name": "E-BRIDGE PRE-SCHOOL PTE. LTD.",
+                      "incidental_charges": "Deposit",
+                      "frequency": "Ad-hoc",
+                      "amount": "720.00"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
