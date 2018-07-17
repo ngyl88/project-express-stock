@@ -6,14 +6,14 @@
   },
   "servers": [
     {
-      "url": "https://express-stock-30545.herokuapp.com"
+      "url": "https://express-stock-30545.herokuapp.com/"
     }
   ],
   "paths": {
     "/": {
       "get": {
-        "summary": "Hello Message",
-        "tags": ["Test"],
+        "summary": "Hello",
+        "tags": ["Public"],
         "responses": {
           "200": {
             "content": {
@@ -30,26 +30,148 @@
         }
       }
     },
-    "/solarPV/list": {
-      "get": {
-        "summary": "List all solar PV installation data from year 2008 to 2015",
-        "tags": ["solarPV installation"],
+    "/signup": {
+      "post": {
+        "summary": "Sign up for an user account",
+        "tags": ["Public"],
+        "requestBody": {
+          "description": "account credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "username": "demo1",
+                  "password": ""
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "An array of solar PV installation data",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "example": {
-                      "year": "2008",
-                      "ura_planning_region": "Overall",
-                      "residential_status": "Residential",
-                      "number_of_solar_pv_installations": "24",
-                      "installed_capacity": "245.7",
-                      "percentage_share_of_total_installed_capacity": "88.2"
-                    }
+                  "type": "String",
+                  "example": {
+                    "message": "Account created for username USERNAME"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description":
+              "User validation failed: username: USERNAME already exists. Please choose another username"
+          },
+          "500": {
+            "description": "Oops! Something went wrong. Please try again later!"
+          }
+        }
+      }
+    },
+    "/signin": {
+      "post": {
+        "summary": "Sign in for a token exchange (Token valid for 30 minutes)",
+        "tags": ["Public"],
+        "requestBody": {
+          "description":
+            "account credentials (to match with registered records)",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "username": "demo1",
+                  "password": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "String",
+                  "example": {
+                    "message": "signin ok",
+                    "token": "GENERATED TOKEN"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "String",
+                  "example": {
+                    "message": "no such user found"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Oops! Something went wrong. Please try again later!"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "List details for registered user accounts",
+        "tags": ["Public"],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                      "message": { "type": "string" },
+                      "users": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "_id": { "type": "string" },
+                            "username": { "type": "string" },
+                            "salt": { "type": "string" },
+                            "hash": { "type": "string" },
+                            "createdAt": { "type": "timestamp" },
+                            "updatedAt": { "type": "timestamp" },
+                            "__v": { "type": "number" }
+                          }
+                        }
+                      }
+                  },
+                  "example": {
+                    "message": "List of users retrieved successfully",
+                    "users": [
+                      {
+                        "_id": "ID",
+                        "username": "demo1",
+                        "salt": "SALT",
+                        "hash": "HASH",
+                        "createdAt": "2018-07-17T15:00:30.269Z",
+                        "updatedAt": "2018-07-17T15:00:30.269Z",
+                        "__v": 0
+                      },
+                      {
+                        "_id": "ID",
+                        "username": "user1",
+                        "salt": "SALT",
+                        "hash": "HASH",
+                        "createdAt": "2018-07-17T15:34:59.005Z",
+                        "updatedAt": "2018-07-17T15:34:59.005Z",
+                        "__v": 0
+                      }
+                    ]
                   }
                 }
               }

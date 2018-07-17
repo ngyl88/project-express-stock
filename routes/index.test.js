@@ -22,10 +22,30 @@ beforeAll(async () => {
   );
 });
 
-test("GET / should return Hello message", async () => {
-  const response = await request.get("/");
-  expect(response.status).toBe(200);
-  expect(response.body.message).toEqual("Hello from Stock API!");
+describe('GET routes', () => {
+  test("GET / should return Hello message", async () => {
+    const response = await request.get("/");
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual("Hello from Stock API!");
+  });
+});
+
+describe('POST /signup routes', () => {
+  test('POST /signup should return success message', () => {
+    
+  });
+  test('POST /signup should return error messages', () => {
+    
+  });
+});
+
+describe('POST /signin routes', () => {
+  test('POST /signin should return success message', () => {
+    
+  });
+  test('POST /signin should return error messages', () => {
+    
+  });
 });
 
 /* Mongo Memory Server Test Setup */
