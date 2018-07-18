@@ -9,11 +9,11 @@ const checkDuplicateTickers = async (tickers, userId) => {
   if (tickersFoundInUserWatchList.length === 0) return [];
   if (Array.isArray(tickers)) {
     const temp = tickers.filter(
-      ticker => tickersFoundInUserWatchList.indexOf(ticker.toLowerCase()) !== -1
+      ticker => tickersFoundInUserWatchList.indexOf(ticker.toUpperCase()) !== -1
     );
     return temp;
   }
-  return tickersFoundInUserWatchList.indexOf(tickers.toLowerCase()) === -1
+  return tickersFoundInUserWatchList.indexOf(tickers.toUpperCase()) === -1
     ? []
     : tickers;
 };

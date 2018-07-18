@@ -4,7 +4,7 @@ const swaggerDocument = require("./swagger.json");
 
 const passport = require("./config/passport");
 
-const error = require("./middleware/error");
+const errorHandler = require("./middleware/errorHandler");
 
 const logger = require("morgan");
 
@@ -41,9 +41,7 @@ indexRouter(app);
 userRouter(app);
 watchlistRouter(app);
 
-app.use(error.handler401);
-app.use(error.handler500);
-
-app.use(error.handler404);
+app.use(errorHandler.handlerPassportAndToken);
+app.use(errorHandler.handler500, errorHandler.handler404);
 
 module.exports = app;

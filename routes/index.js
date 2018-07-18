@@ -3,7 +3,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const { jwtOptions } = require("../config/passport");
 
-const { handler400, handler401 } = require("../middleware/error");
+const { handlerSchemaValidationError, handlerPassportAndToken } = require("../middleware/errorHandler");
 
 const User = require("../models/user");
 
@@ -51,7 +51,7 @@ router.post("/signin", async (req, res, next) => {
   }
 });
 
-router.use(handler400);
-router.use(handler401);
+router.use(handlerSchemaValidationError);
+router.use(handlerPassportAndToken);
 
 module.exports = app => app.use("/", router);

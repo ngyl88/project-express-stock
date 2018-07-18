@@ -9,7 +9,7 @@ const schema = Schema(
       type: String,
       required: [true, "cannot be blank"],
       match: [/[\S]*/, "ticker {VALUE} is invalid"],
-      lowercase: true
+      uppercase: true
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

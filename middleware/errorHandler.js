@@ -3,14 +3,6 @@ const errors = require('../config/errors');
 const mongoose = require("mongoose");
 const { ValidationError } = mongoose.Error;
 
-handlerSuperAuthorization = (err, req, res, next) => {
-  if(err.name === errors.UnauthorizedSuperRequest) {
-    res.status(403).json({ message: err.message });
-    return;
-  }
-  next(err);
-};
-
 handlerWatchList = (err, req, res, next) => {
   if(err.name === errors.ExistingWatchList) {
     res.status(400).json({ message: err.message });
@@ -19,7 +11,7 @@ handlerWatchList = (err, req, res, next) => {
   next(err);
 };
 
-handler400 = (err, req, res, next) => {
+handlerSchemaValidationError = (err, req, res, next) => {
   if (err instanceof ValidationError) {
     res.status(400).json(err.message);
   } else {
@@ -27,7 +19,7 @@ handler400 = (err, req, res, next) => {
   }
 };
 
-handler401 = (err, req, res, next) => {
+handlerPassportAndToken = (err, req, res, next) => {
   if (err.name === errors.PassportAuthenticationError) {
     if (err.message === "TokenExpiredError") {
       res.status(401).json({
@@ -36,9 +28,19 @@ handler401 = (err, req, res, next) => {
     } else {
       res.status(401).json({ message: "Unauthorized" });
     }
+  } else if (err.name === errors.TokenMismatch) {
+    res.status(401).json({ message: err.message });
   } else {
     next(err);
   }
+};
+
+handlerSuperAuthorization = (err, req, res, next) => {
+  if(err.name === errors.UnauthorizedSuperRequest) {
+    res.status(403).json({ message: err.message });
+    return;
+  }
+  next(err);
 };
 
 handler500 = (err, req, res, next) => {
@@ -51,10 +53,10 @@ handler404 = (req, res, next) => {
 };
 
 module.exports = {
-  handler400,
-  handler401,
+  handlerSchemaValidationError,
+  handlerPassportAndToken,
+  handlerSuperAuthorization,
   handler404,
   handler500,
-  handlerWatchList,
-  handlerSuperAuthorization
+  handlerWatchList
 };

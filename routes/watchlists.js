@@ -1,12 +1,12 @@
 const express = require("express");
 
-const passport = require("../config/passport");
-const { handler401, handlerWatchList, handlerSuperAuthorization } = require("../middleware/error");
-
-const { checkSuperAuthorization } = require('../helpers/authorization');
-const watchlistHelper = require('../helpers/watchlist');
-
 const errors = require("../config/errors");
+
+const passport = require("../config/passport");
+const errorHandler = require("../middleware/errorHandler");
+
+const authorizationHelper = require("../helpers/authorization");
+const watchlistHelper = require("../helpers/watchlist");
 
 const WatchList = require("../models/watchlist");
 
@@ -16,9 +16,11 @@ router.use(express.json());
 router.get("/", async (req, res, next) => {
   try {
     if (req.query.admin === "true") {
-      checkSuperAuthorization(req.user.username, 'view the list of watchlist');
+      authorizationHelper.checkSuperAuthorization(
+        req.user.username, "view the list of watchlist"
+      );
 
-      const watchlist = await WatchList.find();
+      const watchlist = await WatchList.find().populate("user");
       res.json({
         message: "All watchlists are retrieved successfully",
         watchlist
@@ -28,7 +30,7 @@ router.get("/", async (req, res, next) => {
 
     const watchlist = await WatchList.findByUser(req.user._id);
     res.json({
-      message: `Watchlist for ${req.user.username} retrieved successfully`,
+      message: `Watchlist retrieved successfully for ${req.user.username}`,
       watchlist
     });
   } catch (err) {
@@ -41,7 +43,10 @@ router.post("/", async (req, res, next) => {
     const user = req.user;
     const tickers = req.body.watchlist;
 
-    const duplicateTickers = await watchlistHelper.checkDuplicateTickers(tickers, user._id);
+    const duplicateTickers = await watchlistHelper.checkDuplicateTickers(
+      tickers,
+      user._id
+    );
     if (duplicateTickers.length > 0) {
       console.log(
         `Rejected new watchlist request: user=${
@@ -65,12 +70,33 @@ router.post("/", async (req, res, next) => {
 });
 
 router.delete("/:id", async (req, res, next) => {
-  
+  try {
+    const watchlistId = req.params.id;
+    
+    const watchlist = await WatchList.findById(watchlistId).populate("user");
+    if (watchlist === null) {
+      return next();
+    }
+
+    if (authorizationHelper.checkMatchingUsers(watchlist.user, req.user)) {
+      const deletedWatchlist = await WatchList.findByIdAndDelete(watchlistId);
+      if (deletedWatchlist === null) {
+        return next();
+      }
+      res.json({
+        message: `Ticker ${watchlist.ticker} successfully deleted from ${
+          watchlist.user.username
+        }'s watchlist`
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.use(handlerSuperAuthorization);
-router.use(handlerWatchList);
-router.use(handler401);
+router.use(errorHandler.handlerWatchList);
+router.use(errorHandler.handlerSuperAuthorization);
+router.use(errorHandler.handlerPassportAndToken);
 
 module.exports = app => {
   app.use("/watchlist", passport.authenticate, router);

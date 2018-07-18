@@ -10,6 +10,16 @@ const checkSuperAuthorization = (username, actionDescription) => {
   return true;
 };
 
+const checkMatchingUsers = (user1, user2) => {
+  if (user1._id.toJSON() !== user2._id.toJSON()) {
+    const e = new Error("Ticker not deleted");
+    e.name = errors.TokenMismatch;
+    throw e;
+  }
+  return true;
+};
+
 module.exports = {
-  checkSuperAuthorization
+  checkSuperAuthorization,
+  checkMatchingUsers
 };
