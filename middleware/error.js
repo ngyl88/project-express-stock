@@ -5,7 +5,6 @@ const { ValidationError } = mongoose.Error;
 
 handler400 = (err, req, res, next) => {
   if (err instanceof ValidationError) {
-    console.log(err);
     res.status(400).json(err.message);
   } else {
     next(err);

@@ -40,7 +40,6 @@ indexRouter(app);
 userRouter(app);
 
 app.use(error.handler401);
-app.use(error.handler400);
 app.use(error.handler500);
 
 app.use(error.handler404);

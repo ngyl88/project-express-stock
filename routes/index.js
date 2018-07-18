@@ -3,6 +3,8 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const { jwtOptions } = require("../config/passport");
 
+const { handler400, handler401 } = require("../middleware/error");
+
 const User = require("../models/user");
 
 const router = express.Router();
@@ -48,5 +50,8 @@ router.post("/signin", async (req, res, next) => {
     next(err);
   }
 });
+
+router.use(handler400);
+router.use(handler401);
 
 module.exports = app => app.use("/", router);
