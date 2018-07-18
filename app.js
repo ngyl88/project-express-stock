@@ -18,6 +18,7 @@ db.on("error", error =>
 
 const indexRouter = require("./routes/index");
 const userRouter = require("./routes/users");
+const watchlistRouter = require("./routes/watchlists");
 
 const app = express();
 app.use(logger("dev"));
@@ -38,6 +39,7 @@ app.use("/secret", passport.authenticate,
 
 indexRouter(app);
 userRouter(app);
+watchlistRouter(app);
 
 app.use(error.handler401);
 app.use(error.handler500);

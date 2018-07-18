@@ -1,7 +1,23 @@
-const { PassportAuthenticationError } = require('../config/errors');
+const errors = require('../config/errors');
 
 const mongoose = require("mongoose");
 const { ValidationError } = mongoose.Error;
+
+handlerSuperAuthorization = (err, req, res, next) => {
+  if(err.name === errors.UnauthorizedSuperRequest) {
+    res.status(403).json({ message: err.message });
+    return;
+  }
+  next(err);
+};
+
+handlerWatchList = (err, req, res, next) => {
+  if(err.name === errors.ExistingWatchList) {
+    res.status(400).json({ message: err.message });
+    return;
+  }
+  next(err);
+};
 
 handler400 = (err, req, res, next) => {
   if (err instanceof ValidationError) {
@@ -12,7 +28,7 @@ handler400 = (err, req, res, next) => {
 };
 
 handler401 = (err, req, res, next) => {
-  if (err.name === PassportAuthenticationError) {
+  if (err.name === errors.PassportAuthenticationError) {
     if (err.message === "TokenExpiredError") {
       res.status(401).json({
         message: "Token expired. Please sign in again"
@@ -38,5 +54,7 @@ module.exports = {
   handler400,
   handler401,
   handler404,
-  handler500
+  handler500,
+  handlerWatchList,
+  handlerSuperAuthorization
 };

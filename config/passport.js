@@ -37,6 +37,7 @@ const authenticate = (req, res, next) => passport.authenticate("jwt", { session:
     e.name = PassportAuthenticationError
     throw e;
   }
+  req.user = user;
   return next();
 }
 )(req, res, next);
