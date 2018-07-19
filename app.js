@@ -41,7 +41,7 @@ indexRouter(app);
 userRouter(app);
 watchlistRouter(app);
 
-app.use(errorHandler.handlerPassportAndToken);
+app.use(errorHandler.handlerPassport);
 app.use(errorHandler.handler500, errorHandler.handler404);
 
 module.exports = app;

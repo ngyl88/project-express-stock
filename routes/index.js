@@ -3,7 +3,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const { jwtOptions } = require("../config/passport");
 
-const { handlerMongooseError, handlerPassportAndToken } = require("../middleware/errorHandler");
+const { handlerMongooseError } = require("../middleware/errorHandler");
 
 const User = require("../models/user");
 
@@ -52,6 +52,5 @@ router.post("/signin", async (req, res, next) => {
 });
 
 router.use(handlerMongooseError);
-router.use(handlerPassportAndToken);
 
 module.exports = app => app.use("/", router);

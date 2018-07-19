@@ -21,7 +21,7 @@ handlerMongooseError = (err, req, res, next) => {
   }
 };
 
-handlerPassportAndToken = (err, req, res, next) => {
+handlerPassport = (err, req, res, next) => {
   if (err.name === errors.PassportAuthenticationError) {
     if (err.message === "TokenExpiredError") {
       res.status(401).json({
@@ -30,7 +30,13 @@ handlerPassportAndToken = (err, req, res, next) => {
     } else {
       res.status(401).json({ message: "Unauthorized" });
     }
-  } else if (err.name === errors.TokenMismatch) {
+  } else {
+    next(err);
+  }
+};
+
+handlerTokenMismatch = (err, req, res, next) => {
+  if (err.name === errors.TokenMismatch) {
     res.status(401).json({ message: err.message });
   } else {
     next(err);
@@ -56,9 +62,10 @@ handler404 = (req, res, next) => {
 
 module.exports = {
   handlerMongooseError,
-  handlerPassportAndToken,
+  handlerPassport,
   handlerSuperAuthorization,
   handler404,
   handler500,
-  handlerWatchList
+  handlerWatchList,
+  handlerTokenMismatch
 };

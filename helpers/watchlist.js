@@ -27,9 +27,11 @@ const createWatchListForUser = async (ticker, user) => {
 };
 const createWatchListsFromRequest = async (tickers, user) => {
   if (Array.isArray(tickers)) {
-    tickers.forEach(ticker => createWatchListForUser(ticker, user));
+    for (let i = 0; i < tickers.length; i++) {
+      await createWatchListForUser(tickers[i], user);
+    }
   } else {
-    createWatchListForUser(tickers, user);
+    await createWatchListForUser(tickers, user);
   }
 };
 

@@ -60,7 +60,7 @@ router.post("/", async (req, res, next) => {
       throw e;
     }
 
-    watchlistHelper.createWatchListsFromRequest(tickers, user);
+    await watchlistHelper.createWatchListsFromRequest(tickers, user);
     res.json({
       message: `Watchlist created for username ${user.username}`
     });
@@ -95,9 +95,9 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 router.use(errorHandler.handlerWatchList);
-router.use(handlerMongooseError);
+router.use(errorHandler.handlerMongooseError);
+router.use(errorHandler.handlerTokenMismatch);
 router.use(errorHandler.handlerSuperAuthorization);
-router.use(errorHandler.handlerPassportAndToken);
 
 module.exports = app => {
   app.use("/watchlist", passport.authenticate, router);

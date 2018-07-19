@@ -1,7 +1,7 @@
 const express = require("express");
 
 const passport = require("../config/passport");
-const { handlerPassportAndToken, handlerSuperAuthorization } = require("../middleware/errorHandler");
+const { handlerSuperAuthorization } = require("../middleware/errorHandler");
 
 const { checkSuperAuthorization } = require('../helpers/authorization');
 
@@ -23,7 +23,6 @@ router.get("/", async (req, res, next) => {
 });
 
 router.use(handlerSuperAuthorization);
-router.use(handlerPassportAndToken);
 
 module.exports = app => {
   app.use("/users", passport.authenticate, router);
