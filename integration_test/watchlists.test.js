@@ -61,7 +61,7 @@ async function createWatchListFor(ticker, username) {
 
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(60000);
 
   const uri = await mongod.getConnectionString();
   await mongoose.connect(uri);

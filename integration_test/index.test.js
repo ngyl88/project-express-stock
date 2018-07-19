@@ -15,7 +15,7 @@ const request = supertest(app);
 
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
-  jest.setTimeout(5000);
+  jest.setTimeout(30000);
 
   const uri = await mongod.getConnectionString();
   await mongoose.connect(
