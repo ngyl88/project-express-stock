@@ -95,6 +95,7 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 router.use(errorHandler.handlerWatchList);
+router.use(handlerMongooseError);
 router.use(errorHandler.handlerSuperAuthorization);
 router.use(errorHandler.handlerPassportAndToken);
 

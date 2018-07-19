@@ -1,7 +1,7 @@
 const errors = require('../config/errors');
 
 const mongoose = require("mongoose");
-const { ValidationError } = mongoose.Error;
+const { CastError, ValidationError } = mongoose.Error;
 
 handlerWatchList = (err, req, res, next) => {
   if(err.name === errors.ExistingWatchList) {
@@ -11,8 +11,10 @@ handlerWatchList = (err, req, res, next) => {
   next(err);
 };
 
-handlerSchemaValidationError = (err, req, res, next) => {
-  if (err instanceof ValidationError) {
+handlerMongooseError = (err, req, res, next) => {
+  if (err instanceof CastError) {
+    res.status(400).json({ message: "Object ID not found" });
+  } else if (err instanceof ValidationError) {
     res.status(400).json(err.message);
   } else {
     next(err);
@@ -44,7 +46,7 @@ handlerSuperAuthorization = (err, req, res, next) => {
 };
 
 handler500 = (err, req, res, next) => {
-  console.log(err);
+  console.error(err);
   res.status(500).json("Oops! Something went wrong. Please try again later!");
 };
 
@@ -53,7 +55,7 @@ handler404 = (req, res, next) => {
 };
 
 module.exports = {
-  handlerSchemaValidationError,
+  handlerMongooseError,
   handlerPassportAndToken,
   handlerSuperAuthorization,
   handler404,
