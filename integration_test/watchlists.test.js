@@ -11,7 +11,7 @@ const WatchList = require("../models/watchlist");
 
 const requestIndex = supertest(require("../app"));
 
-const watchlistRouter = require("./watchlists");
+const watchlistRouter = require("../routes/watchlists");
 const app = express();
 watchlistRouter(app);
 const request = supertest(app);
@@ -61,7 +61,7 @@ async function createWatchListFor(ticker, username) {
 
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
-  jest.setTimeout(12000);
+  jest.setTimeout(10000);
 
   const uri = await mongod.getConnectionString();
   await mongoose.connect(uri);
@@ -117,7 +117,7 @@ describe("GET /watchlist", () => {
     expect(response.body.watchlist.length).toEqual(watchlist.length);
   });
 
-  test("GET /watchlist without auth token return 500", async () => {
+  test("GET /watchlist without auth token return 500 to app", async () => {
     const response = await request.get("/watchlist");
     expect(response.status).toBe(500);
   });
@@ -160,7 +160,7 @@ describe("GET /watchlist?price", () => {
     expect(response.body.unavailable_tickers[0]).toEqual("APPL");
   });
 
-  test("GET /watchlist?price without auth token return 500", async () => {
+  test("GET /watchlist?price without auth token return 500 to app", async () => {
     const response = await request.get("/watchlist?price");
     expect(response.status).toBe(500);
   });
@@ -313,7 +313,7 @@ describe("POST /watchlist", () => {
     );
   });
 
-  test("POST /watchlist without auth token return 500", async () => {
+  test("POST /watchlist without auth token return 500 to app", async () => {
     const response = await request
       .post("/watchlist")
       .send({ watchlist: ["AAPL", "FB", "MSFT"] });
@@ -364,7 +364,7 @@ describe("DELETE /watchlist/:id", () => {
     expect(watchlist.length).toEqual(1);
   });
 
-  test("DELETE /watchlist without auth token return 500", async () => {
+  test("DELETE /watchlist without auth token return 500 to app", async () => {
     // arrange
     const ticker = "FB";
     const username = "user";
@@ -383,3 +383,7 @@ afterAll(() => {
   mongoose.disconnect();
   mongod.stop();
 });
+
+module.exports = {
+  createWatchListFor
+};

@@ -8,14 +8,14 @@ const mongod = new MongoMemoryServer();
 
 const User = require("../models/user");
 
-const indexRouter = require("./index");
+const indexRouter = require("../routes/index");
 const app = express();
 indexRouter(app);
 const request = supertest(app);
 
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
-  jest.setTimeout(120000);
+  jest.setTimeout(5000);
 
   const uri = await mongod.getConnectionString();
   await mongoose.connect(

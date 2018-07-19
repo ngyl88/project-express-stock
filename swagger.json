@@ -29,6 +29,19 @@
           "updatedAt": { "type": "timestamp" },
           "__v": { "type": "number" }
         }
+      },
+      "watchlist": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" },
+          "user": {
+            "$ref": "#/components/schemas/user"
+          },
+          "created": { "type": "string" },
+          "createdAt": { "type": "timestamp" },
+          "updatedAt": { "type": "timestamp" },
+          "__v": { "type": "number" }
+        }
       }
     },
     "responses": {

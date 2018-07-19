@@ -12,7 +12,9 @@
     "start:prod": "NODE_ENV=production npx nodemon server.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:watch:silent": "jest --watch --silent",
+    "test:coverage": "jest --coverage",
+    "test:coverage:silent": "jest --coverage --silent"
   },
   "keywords": [],
   "author": "",

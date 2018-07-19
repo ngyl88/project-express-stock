@@ -8,14 +8,20 @@ const mongod = new MongoMemoryServer();
 
 const User = require("../models/user");
 
-const app = require("../app");
+const requestIndex = supertest(require("../app"));
+
+const userRouter = require("../routes/users");
+const app = express();
+userRouter(app);
 const request = supertest(app);
 
 let superJWTtoken = "";
 let userJWTtoken = "";
 
 async function signup(username, password) {
-  const response = await request.post("/signup").send({ username, password });
+  const response = await requestIndex
+    .post("/signup")
+    .send({ username, password });
 
   expect(response.status).toBe(200);
   expect(response.body.message).toEqual(
@@ -24,7 +30,10 @@ async function signup(username, password) {
 }
 
 async function login(username, password) {
-  const response = await request.post("/signin").send({ username, password });
+  const response = await requestIndex
+    .post("/signin")
+    .send({ username, password });
+  
   expect(response.statusCode).toBe(200);
   expect(response.body.token).toBeDefined();
   return response.body.token;
@@ -55,10 +64,9 @@ test("GET /users will return the list of users successfully", async () => {
   expect(response.body.users.length).toEqual(users.length);
 });
 
-test("GET /users without auth token return 401", async () => {
+test("GET /users without auth token return 500 to app", async () => {
   const response = await request.get("/users");
-  expect(response.status).toBe(401);
-  expect(response.body.message).toEqual("Unauthorized");
+  expect(response.status).toBe(500);
 });
 
 test("GET /users with invalid auth token return 403", async () => {
