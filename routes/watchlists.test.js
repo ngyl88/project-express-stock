@@ -162,6 +162,32 @@ describe("POST /watchlist", () => {
     expect(watchlist.length).toEqual(1);
   });
 
+  test("POST /watchlist for a tickers (existing multiple watchlist) will return success message", async () => {
+    // arrange
+    const username = "user";
+    await createWatchListFor("APPL", username);
+    await createWatchListFor("FB", username);
+
+    const user = await User.find({ username: username });
+    expect(user.length).toEqual(1);
+    const arrangedWatchlist = await WatchList.find({ user: user[0]._id });
+    expect(arrangedWatchlist.length).toEqual(2);
+
+    // act
+    const response = await request
+      .post("/watchlist")
+      .send({ watchlist: "MSFT" })
+      .set("Authorization", "Bearer " + userJWTtoken);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual(
+      `Watchlist created for username ${"user"}`
+    );
+
+    // assert
+    const watchlist = await WatchList.find({ user: user[0]._id });
+    expect(watchlist.length).toEqual(3);
+  });
+
   test("POST /watchlist for an array of tickers will return success message", async () => {
     const response = await request
       .post("/watchlist")
@@ -188,6 +214,45 @@ describe("POST /watchlist", () => {
     const response = await request
       .post("/watchlist")
       .send({ watchlist: ticker })
+      .set("Authorization", "Bearer " + userJWTtoken);
+
+    // assert response
+    expect(response.status).toBe(400);
+    expect(response.body.message).toEqual(
+      `Tickers { ${ticker} } already exist for ${username}`
+    );
+  });
+
+  test("POST /watchlist for duplicate ticker (exisiting multiple watchlist) will return 400", async () => {
+    // arrange
+    const ticker = "FB";
+    const username = "user";
+    await createWatchListFor("APPL", username);
+    await createWatchListFor(ticker, username);
+
+    // act
+    const response = await request
+      .post("/watchlist")
+      .send({ watchlist: ticker })
+      .set("Authorization", "Bearer " + userJWTtoken);
+
+    // assert response
+    expect(response.status).toBe(400);
+    expect(response.body.message).toEqual(
+      `Tickers { ${ticker} } already exist for ${username}`
+    );
+  });
+
+  test("POST /watchlist for an array with duplicate ticker will return 400", async () => {
+    // arrange
+    const ticker = "FB";
+    const username = "user";
+    await createWatchListFor(ticker, username);
+
+    // act
+    const response = await request
+      .post("/watchlist")
+      .send({ watchlist: ["APPL", ticker] })
       .set("Authorization", "Bearer " + userJWTtoken);
 
     // assert response

@@ -17,7 +17,8 @@ router.get("/", async (req, res, next) => {
   try {
     if (req.query.admin === "true") {
       authorizationHelper.checkSuperAuthorization(
-        req.user.username, "view the list of watchlist"
+        req.user.username,
+        "view the list of watchlist"
       );
 
       const watchlist = await WatchList.find().populate("user");
@@ -72,17 +73,13 @@ router.post("/", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   try {
     const watchlistId = req.params.id;
-    
+
     const watchlist = await WatchList.findById(watchlistId).populate("user");
-    if (watchlist === null) {
-      return next();
-    }
+    if (watchlist === null) return next();
 
     if (authorizationHelper.checkMatchingUsers(watchlist.user, req.user)) {
       const deletedWatchlist = await WatchList.findByIdAndDelete(watchlistId);
-      if (deletedWatchlist === null) {
-        return next();
-      }
+      if (deletedWatchlist === null) return next();
       res.json({
         message: `Ticker ${watchlist.ticker} successfully deleted from ${
           watchlist.user.username
