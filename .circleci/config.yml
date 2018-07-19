@@ -17,7 +17,7 @@ jobs:
             - ./node_modules
       - run: # run tests
           name: Run Test
-          command: npm test
+          command: npm run test:coverage:silent
   deploy:
     docker:
       - image: buildpack-deps:trusty

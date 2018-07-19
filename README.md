@@ -19,8 +19,14 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
+You will need to install [MongoDB](https://www.mongodb.com/download-center) and start your DB server.
+
 You will need to acquire a free API key from [World Trading Data](https://www.worldtradingdata.com/).
-You can test the API behaviour by using API tester, for example, [Insomnia REST Client](https://insomnia.rest/), [Postman API Development Environment](https://www.getpostman.com/).
+
+You can test the API behaviour by using web service testing application.
+- [Insomnia REST Client](https://insomnia.rest/)
+- [Postman API Development Environment](https://www.getpostman.com/)
+- [SoapUI](https://www.soapui.org/)
 
 ### Installing
 
@@ -31,7 +37,13 @@ git clone https://github.com/ngyl88/project-express-stock
 npm install
 ```
 
-Set your API key. Start the local server and test with the listening port.
+Run the following to trigger the tests.
+
+```
+npm test
+```
+
+Set your API key. Start the local server and test on the listening port.
 
 ```
 API_KEY_WORLD_TRADING_DATA=<YOUR_API_KEY> node server.js
