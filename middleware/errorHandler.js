@@ -8,6 +8,10 @@ handlerWatchList = (err, req, res, next) => {
     res.status(400).json({ message: err.message });
     return;
   }
+  if(err.name === errors.APIConnectionIssue) {
+    res.status(503).json({ message: err.message });
+    return;
+  }
   next(err);
 };
 

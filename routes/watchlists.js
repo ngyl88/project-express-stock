@@ -7,27 +7,45 @@ const errorHandler = require("../middleware/errorHandler");
 
 const authorizationHelper = require("../helpers/authorization");
 const watchlistHelper = require("../helpers/watchlist");
+const apiHelper = require("../helpers/external");
 
 const WatchList = require("../models/watchlist");
 
 const router = express.Router();
 router.use(express.json());
 
+const getAllWatchList = async (req, res) => {
+  authorizationHelper.checkSuperAuthorization(
+    req.user.username,
+    "view the list of watchlist"
+  );
+  const watchlist = await WatchList.find().populate("user");
+  res.json({
+    message: "All watchlists are retrieved successfully",
+    watchlist
+  });
+};
+
+const connectAPI = async (req, res) => {
+  const watchlist = await WatchList.findTickersByUser(req.user._id);
+
+  const tickers = watchlist.join(",");
+
+  const response = await apiHelper.getPriceFromAPI(tickers);
+  res.json({
+    message: `Stock prices on watchlist retrieved successfully for ${
+      req.user.username
+    }`,
+    stock_information: response.stock_information,
+    unavailable_tickers: response.unavailable_tickers
+  });
+};
+
 router.get("/", async (req, res, next) => {
   try {
-    if (req.query.admin === "true") {
-      authorizationHelper.checkSuperAuthorization(
-        req.user.username,
-        "view the list of watchlist"
-      );
+    if (req.query.admin === "true") return await getAllWatchList(req, res);
 
-      const watchlist = await WatchList.find().populate("user");
-      res.json({
-        message: "All watchlists are retrieved successfully",
-        watchlist
-      });
-      return;
-    }
+    if (req.query["price"] !== undefined) return await connectAPI(req, res);
 
     const watchlist = await WatchList.findByUser(req.user._id);
     res.json({

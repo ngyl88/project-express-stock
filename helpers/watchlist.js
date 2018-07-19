@@ -1,11 +1,8 @@
 const WatchList = require("../models/watchlist");
 
-// GET Requests
-
-// POST Requests
 const checkDuplicateTickers = async (tickers, userId) => {
   const tickersFoundInUserWatchList = await WatchList.findTickersByUser(userId);
-  
+
   if (tickersFoundInUserWatchList.length === 0) return [];
   if (Array.isArray(tickers)) {
     const duplicated = tickers.filter(

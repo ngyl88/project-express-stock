@@ -78,6 +78,10 @@ beforeEach(async () => {
 
 describe("GET /watchlist", () => {
   test("GET /watchlist for super will return watchlist for super", async () => {
+    await createWatchListFor("AAPL", "user");
+    await createWatchListFor("AAPL", "super");
+    await createWatchListFor("FB", "user");
+
     const response = await request
       .get("/watchlist")
       .set("Authorization", "Bearer " + superJWTtoken);
@@ -94,6 +98,10 @@ describe("GET /watchlist", () => {
   });
 
   test("GET /watchlist for user will return watchlist for user", async () => {
+    await createWatchListFor("AAPL", "user");
+    await createWatchListFor("AAPL", "super");
+    await createWatchListFor("FB", "user");
+
     const response = await request
       .get("/watchlist")
       .set("Authorization", "Bearer " + userJWTtoken);
@@ -115,9 +123,52 @@ describe("GET /watchlist", () => {
   });
 });
 
+describe("GET /watchlist?price", () => {
+  test("GET /watchlist?price for user will return stock prices for user", async () => {
+    await createWatchListFor("AAPL", "user");
+    await createWatchListFor("AAPL", "super");
+    await createWatchListFor("FB", "user");
+
+    const response = await request
+      .get("/watchlist?price")
+      .set("Authorization", "Bearer " + userJWTtoken);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual(
+      `Stock prices on watchlist retrieved successfully for ${"user"}`
+    );
+
+    expect(response.body.stock_information).toBeInstanceOf(Array);
+    expect(response.body.stock_information.length).toEqual(2);
+  });
+
+  test("GET /watchlist?price for user will return unavailable tickers", async () => {
+    await createWatchListFor("APPL", "user");
+    await createWatchListFor("AAPL", "super");
+    await createWatchListFor("FB", "user");
+    await createWatchListFor("MSFT", "user");
+
+    const response = await request
+      .get("/watchlist?price")
+      .set("Authorization", "Bearer " + userJWTtoken);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual(
+      `Stock prices on watchlist retrieved successfully for ${"user"}`
+    );
+    expect(response.body.stock_information).toBeInstanceOf(Array);
+    expect(response.body.stock_information.length).toEqual(2);
+    expect(response.body.unavailable_tickers.length).toEqual(1);
+    expect(response.body.unavailable_tickers[0]).toEqual("APPL");
+  });
+
+  test("GET /watchlist?price without auth token return 500", async () => {
+    const response = await request.get("/watchlist?price");
+    expect(response.status).toBe(500);
+  });
+});
+
 describe("GET /watchlist with admin option", () => {
   test("GET /watchlist with admin for super will return all watchlist", async () => {
-    await createWatchListFor("APPL", "user");
+    await createWatchListFor("AAPL", "user");
 
     const response = await request
       .get("/watchlist?admin=true")
@@ -165,7 +216,7 @@ describe("POST /watchlist", () => {
   test("POST /watchlist for a tickers (existing multiple watchlist) will return success message", async () => {
     // arrange
     const username = "user";
-    await createWatchListFor("APPL", username);
+    await createWatchListFor("AAPL", username);
     await createWatchListFor("FB", username);
 
     const user = await User.find({ username: username });
@@ -191,7 +242,7 @@ describe("POST /watchlist", () => {
   test("POST /watchlist for an array of tickers will return success message", async () => {
     const response = await request
       .post("/watchlist")
-      .send({ watchlist: ["APPL", "FB", "MSFT"] })
+      .send({ watchlist: ["AAPL", "FB", "MSFT"] })
       .set("Authorization", "Bearer " + userJWTtoken);
     expect(response.status).toBe(200);
     expect(response.body.message).toEqual(
@@ -227,7 +278,7 @@ describe("POST /watchlist", () => {
     // arrange
     const ticker = "FB";
     const username = "user";
-    await createWatchListFor("APPL", username);
+    await createWatchListFor("AAPL", username);
     await createWatchListFor(ticker, username);
 
     // act
@@ -252,7 +303,7 @@ describe("POST /watchlist", () => {
     // act
     const response = await request
       .post("/watchlist")
-      .send({ watchlist: ["APPL", ticker] })
+      .send({ watchlist: ["AAPL", ticker] })
       .set("Authorization", "Bearer " + userJWTtoken);
 
     // assert response
@@ -265,7 +316,7 @@ describe("POST /watchlist", () => {
   test("POST /watchlist without auth token return 500", async () => {
     const response = await request
       .post("/watchlist")
-      .send({ watchlist: ["APPL", "FB", "MSFT"] });
+      .send({ watchlist: ["AAPL", "FB", "MSFT"] });
 
     expect(response.status).toBe(500);
   });
