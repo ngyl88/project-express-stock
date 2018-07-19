@@ -9,11 +9,61 @@
       "url": "https://express-stock-30545.herokuapp.com/"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "user": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "username": { "type": "string" },
+          "salt": { "type": "string" },
+          "hash": { "type": "string" },
+          "createdAt": { "type": "timestamp" },
+          "updatedAt": { "type": "timestamp" },
+          "__v": { "type": "number" }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Possible data request issue",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "String",
+              "example": {
+                "message": "Validation Messages | Object ID not found"
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not found."
+      },
+      "ServerError": {
+        "description": "Oops! Something went wrong. Please try again later!"
+      },
+      "UnauthorizedError": {
+        "description": "Unauthorized | Token expired | Token mismatch"
+      },
+      "UnauthorizedSuperRequest": {
+        "description": "Forbidden"
+      }
+    }
+  },
   "paths": {
     "/": {
       "get": {
-        "summary": "Hello",
-        "tags": ["Public"],
+        "summary": "Hello from Stock API!",
+        "tags": ["General"],
         "responses": {
           "200": {
             "content": {
@@ -30,10 +80,38 @@
         }
       }
     },
+    "/secret": {
+      "get": {
+        "summary": "Route to test for token authentication",
+        "tags": ["General"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "String",
+                  "example": {
+                    "message": "You see the secret"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
     "/signup": {
       "post": {
         "summary": "Sign up for an user account",
-        "tags": ["Public"],
+        "tags": ["User Service"],
         "requestBody": {
           "description": "account credentials",
           "required": true,
@@ -62,11 +140,10 @@
             }
           },
           "400": {
-            "description":
-              "User validation failed: username: USERNAME already exists. Please choose another username"
+            "$ref": "#/components/responses/BadRequest"
           },
           "500": {
-            "description": "Oops! Something went wrong. Please try again later!"
+            "$ref": "#/components/responses/ServerError"
           }
         }
       }
@@ -74,7 +151,7 @@
     "/signin": {
       "post": {
         "summary": "Sign in for a token exchange (Token valid for 30 minutes)",
-        "tags": ["Public"],
+        "tags": ["User Service"],
         "requestBody": {
           "description":
             "account credentials (to match with registered records)",
@@ -105,19 +182,10 @@
             }
           },
           "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "String",
-                  "example": {
-                    "message": "no such user found"
-                  }
-                }
-              }
-            }
+            "description": "no such user found"
           },
           "500": {
-            "description": "Oops! Something went wrong. Please try again later!"
+            "$ref": "#/components/responses/ServerError"
           }
         }
       }
@@ -125,7 +193,12 @@
     "/users": {
       "get": {
         "summary": "List details for registered user accounts",
-        "tags": ["Public"],
+        "tags": ["Admin"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -133,22 +206,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                      "message": { "type": "string" },
-                      "users": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "_id": { "type": "string" },
-                            "username": { "type": "string" },
-                            "salt": { "type": "string" },
-                            "hash": { "type": "string" },
-                            "createdAt": { "type": "timestamp" },
-                            "updatedAt": { "type": "timestamp" },
-                            "__v": { "type": "number" }
-                          }
-                        }
+                    "message": { "type": "string" },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/user"
                       }
+                    }
                   },
                   "example": {
                     "message": "List of users retrieved successfully",
@@ -176,10 +240,20 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedSuperRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
           }
         }
       }
     },
+
     "/solarPV/search": {
       "get": {
         "summary": "Search all available solar PV installation data",
@@ -243,6 +317,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           }
         }
       }
