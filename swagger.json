@@ -462,7 +462,7 @@
             }
           },
           {
-            "name": "ticker",
+            "name": "newTicker",
             "in": "path",
             "required": true,
             "description": "new ticker under the user's watchlist",
