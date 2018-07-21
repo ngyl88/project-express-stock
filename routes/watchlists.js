@@ -19,7 +19,7 @@ const getAllWatchList = async (req, res) => {
     req.user.username,
     "view the list of watchlist"
   );
-  const watchlist = await WatchList.find().populate("user");
+  const watchlist = await WatchList.find().populate("user", "username");
   res.json({
     message: "All watchlists are retrieved successfully",
     watchlist
@@ -43,7 +43,7 @@ const connectAPI = async (req, res) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    if (req.query.admin === "true") return await getAllWatchList(req, res);
+    if (req.query.all === "true") return await getAllWatchList(req, res);
 
     if (req.query["price"] !== undefined) return await connectAPI(req, res);
 

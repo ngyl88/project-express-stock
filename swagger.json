@@ -23,8 +23,6 @@
         "properties": {
           "_id": { "type": "string" },
           "username": { "type": "string" },
-          "salt": { "type": "string" },
-          "hash": { "type": "string" },
           "createdAt": { "type": "timestamp" },
           "updatedAt": { "type": "timestamp" },
           "__v": { "type": "number" }
@@ -318,9 +316,9 @@
             }
           },
           {
-            "name": "admin",
+            "name": "all",
             "in": "query",
-            "description": "true to return watchlist for all users (admin access required)",
+            "description": "true to return watchlist for all users (require admin access)",
             "schema": {
               "type": "boolean"
             }

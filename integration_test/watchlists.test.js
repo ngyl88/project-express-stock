@@ -166,12 +166,12 @@ describe("GET /watchlist?price", () => {
   });
 });
 
-describe("GET /watchlist with admin option", () => {
-  test("GET /watchlist with admin for super will return all watchlist", async () => {
+describe("GET /watchlist with all option", () => {
+  test("GET /watchlist with all option will return all watchlist", async () => {
     await createWatchListFor("AAPL", "user");
 
     const response = await request
-      .get("/watchlist?admin=true")
+      .get("/watchlist?all=true")
       .set("Authorization", "Bearer " + superJWTtoken);
 
     expect(response.status).toBe(200);
@@ -185,9 +185,9 @@ describe("GET /watchlist with admin option", () => {
     expect(response.body.watchlist.length).toBeGreaterThan(0);
   });
 
-  test("GET /watchlist with admin (invalid auth token) return 403", async () => {
+  test("GET /watchlist with all (invalid auth token) return 403", async () => {
     const response = await request
-      .get("/watchlist?admin=true")
+      .get("/watchlist?all=true")
       .set("Authorization", "Bearer " + userJWTtoken);
     expect(response.status).toBe(403);
     expect(response.body.message).toEqual(

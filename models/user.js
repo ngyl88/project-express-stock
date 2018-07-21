@@ -21,6 +21,13 @@ const userSchema = mongoose.Schema(
 
 userSchema.plugin(uniqueValidator, { message: "{VALUE} already exists. Please choose another username" });
 
+if (!userSchema.options.toObject) userSchema.options.toObject = {};
+userSchema.options.toObject.transform = function (doc, ret, options) {
+  delete ret.hash;
+  delete ret.salt;
+  return ret;
+}
+
 // use ES5 function to prevent `this` from becoming undefined
 userSchema.methods.setPassword = function(password) {
   this.salt = generateSalt();
