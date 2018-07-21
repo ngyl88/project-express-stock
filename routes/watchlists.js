@@ -5,6 +5,8 @@ const errors = require("../config/errors");
 const passport = require("../config/passport");
 const errorHandler = require("../middleware/errorHandler");
 
+const watchlistMiddleware = require("../middleware/watchlist");
+
 const authorizationHelper = require("../helpers/authorization");
 const watchlistHelper = require("../helpers/watchlist");
 const apiHelper = require("../helpers/external");
@@ -88,22 +90,17 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", watchlistMiddleware.authenticate, async (req, res, next) => {
   try {
-    const watchlistId = req.params.id;
+    if (!req.watchlist) return next();
 
-    const watchlist = await WatchList.findById(watchlistId).populate("user");
-    if (watchlist === null) return next();
-
-    if (authorizationHelper.checkMatchingUsers(watchlist.user, req.user)) {
-      const deletedWatchlist = await WatchList.findByIdAndDelete(watchlistId);
-      if (deletedWatchlist === null) return next();
-      res.json({
-        message: `Ticker ${watchlist.ticker} successfully deleted from ${
-          watchlist.user.username
-        }'s watchlist`
-      });
-    }
+    const deletedWatchlist = await WatchList.findByIdAndDelete(req.watchlist._id).populate("user");
+    if (deletedWatchlist === null) return next();
+    res.json({
+      message: `Ticker ${deletedWatchlist.ticker} successfully deleted from ${
+        deletedWatchlist.user.username
+      }'s watchlist`
+    });
   } catch (err) {
     next(err);
   }
