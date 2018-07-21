@@ -7,7 +7,7 @@ const authenticate = async (req, res, next) => {
     const watchlistId = req.params.id;
 
     const watchlist = await WatchList.findById(watchlistId).populate("user");
-    if (watchlist === null) next();
+    if (watchlist === null) return next();
 
     if (authorizationHelper.checkMatchingUsers(watchlist.user, req.user)) {
       req.watchlist = watchlist;

@@ -69,14 +69,8 @@ router.post("/", async (req, res, next) => {
       user._id
     );
     if (duplicateTickers.length > 0) {
-      console.log(
-        `Rejected new watchlist request: user=${
-          user.username
-        }, tickers=${duplicateTickers}`
-      );
-      const e = new Error(
-        `Tickers { ${duplicateTickers} } already exist for ${user.username}`
-      );
+      console.log(`Rejected new watchlist request: user=${user.username}, tickers=${duplicateTickers}`);
+      const e = new Error(`Tickers { ${duplicateTickers} } already exist for ${user.username}`);
       e.name = errors.ExistingWatchList;
       throw e;
     }
@@ -90,21 +84,52 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.delete("/:id", watchlistMiddleware.authenticate, async (req, res, next) => {
-  try {
-    if (!req.watchlist) return next();
-
-    const deletedWatchlist = await WatchList.findByIdAndDelete(req.watchlist._id).populate("user");
-    if (deletedWatchlist === null) return next();
-    res.json({
-      message: `Ticker ${deletedWatchlist.ticker} successfully deleted from ${
-        deletedWatchlist.user.username
-      }'s watchlist`
-    });
-  } catch (err) {
-    next(err);
+router.put("/:id/:ticker",
+  watchlistMiddleware.authenticate, 
+  async (req, res, next) => {
+    try {
+      if (!req.watchlist) return next();
+      
+      const { id, ticker } = req.params;
+      
+      const update = {
+        ...req.watchlist.toJSON(),
+        ticker: req.params.ticker,
+        updated: Date.now()
+      }
+      
+      const updatedWatchlist = await WatchList.findByIdAndUpdate(id, update);
+      if (updatedWatchlist === null) return next();
+      
+      const oldTicker = req.watchlist.ticker;
+      const { username } = req.watchlist.user;
+      res.json({
+        message: `Ticker successfully updated from ${oldTicker} to ${ticker.toUpperCase()} on ${username}'s watchlist`
+      });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
+
+router.delete("/:id",
+  watchlistMiddleware.authenticate,
+  async (req, res, next) => {
+    try {
+      if (!req.watchlist) return next();
+
+      const deletedWatchlist = await WatchList
+        .findByIdAndDelete(req.params.id)
+        .populate("user");
+      if (deletedWatchlist === null) return next();
+      res.json({
+        message: `Ticker ${deletedWatchlist.ticker} successfully deleted from ${deletedWatchlist.user.username}'s watchlist`
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 router.use(errorHandler.handlerWatchList);
 router.use(errorHandler.handlerMongooseError);

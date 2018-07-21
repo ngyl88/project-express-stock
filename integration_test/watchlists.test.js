@@ -1,17 +1,12 @@
+const { mongoose, mongod, signup, signin, createWatchListFor } = require('../test/helper');
+
 const express = require("express");
 const supertest = require("supertest");
 
-/* Mongo Memory Server Test Setup */
-const mongoose = require("mongoose");
-const { MongoMemoryServer } = require("mongodb-memory-server");
-const mongod = new MongoMemoryServer();
-
 const User = require("../models/user");
 const WatchList = require("../models/watchlist");
-
-const requestIndex = supertest(require("../app"));
-
 const watchlistRouter = require("../routes/watchlists");
+
 const app = express();
 watchlistRouter(app);
 const request = supertest(app);
@@ -19,61 +14,21 @@ const request = supertest(app);
 let superJWTtoken = "";
 let userJWTtoken = "";
 
-async function signup(username, password) {
-  const response = await requestIndex
-    .post("/signup")
-    .send({ username, password });
-
-  expect(response.status).toBe(200);
-  expect(response.body.message).toEqual(
-    `Account created for username ${username}`
-  );
-}
-
-async function login(username, password) {
-  const response = await requestIndex
-    .post("/signin")
-    .send({ username, password });
-  expect(response.statusCode).toBe(200);
-  expect(response.body.token).toBeDefined();
-  return response.body.token;
-}
-
-async function createWatchListFor(ticker, username) {
-  const user = await User.find({ username: username });
-  expect(user.length).toEqual(1);
-  const userId = user[0]._id;
-  const watchlist = new WatchList({
-    ticker,
-    user: userId
-  });
-  await watchlist.save();
-
-  const createdWatchlist = await WatchList.find({
-    ticker: ticker,
-    user: userId
-  });
-  expect(createdWatchlist.length).toEqual(1);
-  const watchlistId = createdWatchlist[0]._id;
-
-  return { userId, watchlistId };
-}
-
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
   jest.setTimeout(60000);
 
   const uri = await mongod.getConnectionString();
-  await mongoose.connect(uri);
+  await mongoose.connect(uri, { useNewUrlParser: true });
 });
 
 beforeEach(async () => {
   mongoose.connection.db.dropDatabase();
 
   await signup("super", "super");
-  superJWTtoken = await login("super", "super");
+  superJWTtoken = await signin("super", "super");
   await signup("user", "user");
-  userJWTtoken = await login("user", "user");
+  userJWTtoken = await signin("user", "user");
 });
 
 describe("GET /watchlist", () => {
@@ -322,6 +277,63 @@ describe("POST /watchlist", () => {
   });
 });
 
+describe("PUT /watchlist/:id", () => {
+  test("PUT /watchlist/:id/:ticker will return success message", async () => {
+    // arrange
+    const oldTicker = "APPL";
+    const newTicker = "aapl";
+    const username = "user";
+    const { userId, watchlistId } = await createWatchListFor(oldTicker, username);
+
+    // act
+    const response = await request
+      .put(`/watchlist/${watchlistId}/${newTicker}`)
+      .set("Authorization", "Bearer " + userJWTtoken);
+
+    // assert response
+    expect(response.status).toBe(200);
+    expect(response.body.message).toEqual(
+      `Ticker successfully updated from ${oldTicker} to ${newTicker.toUpperCase()} on ${username}'s watchlist`
+    );
+
+    // assert db
+    const watchlist = await WatchList.find({ ticker: newTicker.toUpperCase(), user: userId });
+    expect(watchlist.length).toEqual(1);
+  });
+
+  test("PUT /watchlist/:id using mismatched token will return 401", async () => {
+    // arrange
+    const ticker = "FB";
+    const username = "user";
+    const { userId, watchlistId } = await createWatchListFor(ticker, username);
+
+    // act
+    const response = await request
+      .put(`/watchlist/${watchlistId}/MSFT`)
+      .set("Authorization", "Bearer " + superJWTtoken);
+
+    // assert response
+    expect(response.status).toBe(401);
+
+    // assert db
+    const watchlist = await WatchList.find({ ticker: ticker, user: userId });
+    expect(watchlist.length).toEqual(1);
+  });
+
+  test("PUT /watchlist without auth token return 500 to app", async () => {
+    // arrange
+    const ticker = "FB";
+    const username = "user";
+    const { userId, watchlistId } = await createWatchListFor(ticker, username);
+
+    // act
+    const response = await request.put(`/watchlist/${watchlistId}/VOD.L`);
+
+    // assert response
+    expect(response.status).toBe(500);
+  });
+});
+
 describe("DELETE /watchlist/:id", () => {
   test("DELETE /watchlist/:id will return success message", async () => {
     // arrange
@@ -383,7 +395,3 @@ afterAll(() => {
   mongoose.disconnect();
   mongod.stop();
 });
-
-module.exports = {
-  createWatchListFor
-};

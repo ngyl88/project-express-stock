@@ -1,30 +1,24 @@
+const { mongoose, mongod, signup, createWatchListFor } = require("./test/helper");
+
 const supertest = require("supertest");
-
-const { createWatchListFor } = require('./integration_test/watchlists.test.js');
-
-/* Mongo Memory Server Test Setup */
-// const mongoose = require("mongoose");
-// const { MongoMemoryServer } = require("mongodb-memory-server");
-// const mongod = new MongoMemoryServer();
-
-// const User = require("../models/user");
 
 const app = require("./app");
 const request = supertest(app);
 
 /* Mongo Memory Server Test Setup */
-// beforeAll(async () => {
-//     jest.setTimeout(12000);
+beforeAll(async () => {
+  jest.setTimeout(10000);
 
-//     const uri = await mongod.getConnectionString();
-//     await mongoose.connect(uri);
+  const uri = await mongod.getConnectionString();
+  await mongoose.connect(uri);
+});
 
-//     await signup("super", "super");
-//     superJWTtoken = await login("super", "super");
-//     await signup("user", "user");
-//     userJWTtoken = await login("user", "user");
-// });
+beforeEach(async () => {
+  mongoose.connection.db.dropDatabase();
+  await signup("user", "user");
+});
 
+/* Tests */
 describe("/users protected route", () => {
   test("GET /users without auth token return 401", async () => {
     const response = await request.get("/users");
@@ -49,26 +43,26 @@ describe("/watchlist protected route", () => {
     const response = await request
       .post("/watchlist")
       .send({ watchlist: ["AAPL", "FB", "MSFT"] });
+    expect(response.status).toBe(401);
+  });
 
+  test("PUT /watchlist without auth token return 401", async () => {
+    const { watchlistId, ...rest } = await createWatchListFor("FB", "user");
+
+    const response = await request.put(`/watchlist/${watchlistId}/AAPL`);
     expect(response.status).toBe(401);
   });
 
   test("DELETE /watchlist without auth token return 401", async () => {
-    // arrange
-    const ticker = "FB";
-    const username = "user";
-    const { userId, watchlistId } = await createWatchListFor(ticker, username);
+    const { watchlistId, ...rest } = await createWatchListFor("FB", "user");
 
-    // act
     const response = await request.delete(`/watchlist/${watchlistId}`);
-
-    // assert response
     expect(response.status).toBe(401);
   });
 });
 
 /* Mongo Memory Server Test Setup */
-// afterAll(() => {
-//     mongoose.disconnect();
-//     mongod.stop();
-// });
+afterAll(() => {
+  mongoose.disconnect();
+  mongod.stop();
+});

@@ -22,7 +22,8 @@ const schema = Schema(
         message: "not a valid user"
       }
     },
-    created: { type: Date, default: Date.now }
+    created: { type: Date, default: Date.now },
+    updated: { type: Date, default: Date.now }
   },
   { timestamps: true }
 );

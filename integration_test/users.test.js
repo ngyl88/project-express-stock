@@ -1,16 +1,11 @@
+const { mongoose, mongod, signup, signin } = require("../test/helper");
+
 const express = require("express");
 const supertest = require("supertest");
 
-/* Mongo Memory Server Test Setup */
-const mongoose = require("mongoose");
-const { MongoMemoryServer } = require("mongodb-memory-server");
-const mongod = new MongoMemoryServer();
-
 const User = require("../models/user");
-
-const requestIndex = supertest(require("../app"));
-
 const userRouter = require("../routes/users");
+
 const app = express();
 userRouter(app);
 const request = supertest(app);
@@ -18,40 +13,24 @@ const request = supertest(app);
 let superJWTtoken = "";
 let userJWTtoken = "";
 
-async function signup(username, password) {
-  const response = await requestIndex
-    .post("/signup")
-    .send({ username, password });
-
-  expect(response.status).toBe(200);
-  expect(response.body.message).toEqual(
-    `Account created for username ${username}`
-  );
-}
-
-async function login(username, password) {
-  const response = await requestIndex
-    .post("/signin")
-    .send({ username, password });
-  
-  expect(response.statusCode).toBe(200);
-  expect(response.body.token).toBeDefined();
-  return response.body.token;
-}
-
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
-  jest.setTimeout(12000);
+  jest.setTimeout(10000);
 
   const uri = await mongod.getConnectionString();
-  await mongoose.connect(uri);
-
-  await signup("super", "super");
-  superJWTtoken = await login("super", "super");
-  await signup("user", "user");
-  userJWTtoken = await login("user", "user");
+  await mongoose.connect(uri, { useNewUrlParser: true });
 });
 
+beforeEach(async () => {
+  mongoose.connection.db.dropDatabase();
+  
+  await signup("super", "super");
+  superJWTtoken = await signin("super", "super");
+  await signup("user", "user");
+  userJWTtoken = await signin("user", "user");
+});
+
+/* Tests */
 test("GET /users will return the list of users successfully", async () => {
   const response = await request
     .get("/users")
@@ -70,7 +49,9 @@ test("GET /users without auth token return 500 to app", async () => {
 });
 
 test("GET /users with invalid auth token return 403", async () => {
-  const response = await request.get("/users").set("Authorization", "Bearer " + userJWTtoken);
+  const response = await request
+    .get("/users")
+    .set("Authorization", "Bearer " + userJWTtoken);
   expect(response.status).toBe(403);
   expect(response.body.message).toEqual(
     "Not authorized to view the list of users"

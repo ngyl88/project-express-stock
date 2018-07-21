@@ -1,10 +1,7 @@
+const { mongoose, mongod } = require("../test/helper");
+
 const supertest = require("supertest");
 const express = require("express");
-
-/* Mongo Memory Server Test Setup */
-const mongoose = require("mongoose");
-const { MongoMemoryServer } = require("mongodb-memory-server");
-const mongod = new MongoMemoryServer();
 
 const User = require("../models/user");
 
@@ -15,13 +12,10 @@ const request = supertest(app);
 
 /* Mongo Memory Server Test Setup */
 beforeAll(async () => {
-  jest.setTimeout(30000);
+  jest.setTimeout(10000);
 
   const uri = await mongod.getConnectionString();
-  await mongoose.connect(
-    uri,
-    { useNewUrlParser: true }
-  );
+  await mongoose.connect(uri, { useNewUrlParser: true });
 });
 
 describe("GET routes", () => {

@@ -37,6 +37,7 @@
             "$ref": "#/components/schemas/user"
           },
           "created": { "type": "string" },
+          "updated": { "type": "string" },
           "createdAt": { "type": "timestamp" },
           "updatedAt": { "type": "timestamp" },
           "__v": { "type": "number" }
@@ -47,7 +48,8 @@
         "properties": {
           "id": { "type": "string" },
           "ticker": { "type": "string" },
-          "created": { "type": "string" }
+          "created": { "type": "string" },
+          "updated": { "type": "string" }
         }
       },
       "watchlistWithPrice": {
@@ -440,9 +442,9 @@
         }
       }
     },
-    "/watchlist/{id}": {
-      "delete": {
-        "summary": "Delete a ticker under watchlist for a signed-in user",
+    "/watchlist/{watchlistId}/{newTicker}": {
+      "put": {
+        "summary": "Update a ticker under watchlist for a signed-in user",
         "tags": ["WatchList Service"],
         "security": [
           {
@@ -451,10 +453,19 @@
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "watchlistId",
             "in": "path",
             "required": true,
-            "description": "id of the ticker on the user's watchlist",
+            "description": "id of the user's watchlist to be updated",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ticker",
+            "in": "path",
+            "required": true,
+            "description": "new ticker under the user's watchlist",
             "schema": {
               "type": "string"
             }
@@ -467,7 +478,49 @@
                 "schema": {
                   "type": "String",
                   "example": {
-                    "message": "Watchlist created for username USERNAME"
+                    "message": "Ticker successfully updated from OLD-TICKER to NEW-TICKER on USERNAME's watchlist"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/watchlist/{watchlistId}": {
+      "delete": {
+        "summary": "Delete a ticker under watchlist for a signed-in user",
+        "tags": ["WatchList Service"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "watchlistId",
+            "in": "path",
+            "required": true,
+            "description": "id of the user's watchlist to be deleted",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "String",
+                  "example": {
+                    "message": "Ticker TICKER successfully deleted from USERNAME's watchlist"
                   }
                 }
               }
