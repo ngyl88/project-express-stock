@@ -27,7 +27,6 @@ const jwtStrategy = new JwtStrategy(jwtOptions, verify);
 
 passport.use(jwtStrategy);
 
-// REF: https://jonathas.com/token-based-authentication-in-nodejs-with-passport-jwt-and-bcrypt/
 const authenticate = (req, res, next) => passport.authenticate("jwt", { session: false },
 (err, user, info) => {
   if (err) return next(err);

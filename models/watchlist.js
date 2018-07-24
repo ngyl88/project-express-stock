@@ -28,7 +28,6 @@ const schema = Schema(
   { timestamps: true }
 );
 
-// STATIC METHODS on SCHEMA
 schema.statics.findByUser = async function(userId) {
   const raw = await this.find({ user: userId });
   return raw.map(each => {

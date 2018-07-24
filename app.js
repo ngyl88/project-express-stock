@@ -22,7 +22,6 @@ const watchlistRouter = require("./routes/watchlists");
 
 const app = express();
 app.use(logger("dev"));
-// app.use(passport.initialize());
 
 var swaggerOptions = { explorer: false };
 app.use(
