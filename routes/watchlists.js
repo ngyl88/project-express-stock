@@ -4,7 +4,7 @@ const passport = require("../config/passport");
 const errorHandler = require("../middleware/errorHandler");
 
 const watchlistMiddleware = require("../middleware/watchlist");
-const watchlistService = require("../middleware/watchListService");
+const watchlistService = require("../middleware/watchlistService");
 
 const router = express.Router();
 router.use(express.json());
