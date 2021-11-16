@@ -1,10 +1,26 @@
 require("dotenv").config();
 
+const errors = require("../config/errors");
+
 const axios = require("axios");
 axios.defaults.baseURL = "http://api.marketstack.com/v1";
 axios.defaults.timeout = 3000;
 
-const errors = require("../config/errors");
+const axiosAlphaVantageinstance = axios.create({
+  baseURL: 'https://www.alphavantage.co/'
+});
+
+const queryAlphaVantage = async symbol => {
+  try {
+    const response = await axiosAlphaVantageinstance.get(`query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${process.env.ALPHAVANTAGE_API_KEY}`);
+    return await response.json();
+  } catch (err) {
+    console.error("APIConnectionIssue in queryAlphaVantage:", err);
+    const e = new Error("Unable to hit service provider...");
+    e.name = errors.APIConnectionIssue;
+    throw e;
+  }
+}
 
 const transformData = stocks => {
   return stocks.map(stock => {
@@ -54,5 +70,6 @@ const getPriceFromAPI = async tickers => {
 };
 
 module.exports = {
-  getPriceFromAPI
+  getPriceFromAPI,
+  queryAlphaVantage
 };

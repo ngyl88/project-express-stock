@@ -51,6 +51,7 @@ npm test
 Set up `.env` or `.envrc`. Start the local server and test on the listening port.
 
 ```
+ALPHAVANTAGE_API_KEY=
 API_KEY_WORLD_TRADING_DATA=<YOUR_MARKETSTACK_API_KEY>
 JWT_SECRET=
 MONGODB_URI=
