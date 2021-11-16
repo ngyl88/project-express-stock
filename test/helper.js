@@ -36,6 +36,9 @@ const signin = async (username, password) => {
 
 const createWatchListFor = async (ticker, username) => {
   const user = await User.find({ username: username });
+
+  console.debug('User found.');
+
   expect(user.length).toEqual(1);
   const userId = user[0]._id;
   const watchlist = new WatchList({
@@ -43,6 +46,8 @@ const createWatchListFor = async (ticker, username) => {
     user: userId
   });
   await watchlist.save();
+
+  console.debug('watchlist saved.');
 
   const createdWatchlist = await WatchList.find({
     ticker: ticker,

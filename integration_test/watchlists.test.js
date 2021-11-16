@@ -87,6 +87,8 @@ describe("GET /watchlist?price", () => {
     await createWatchListFor("AAPL", "super");
     await createWatchListFor("FB", "user");
 
+    console.debug('test setup done.');
+
     const response = await request
       .get("/watchlist?price")
       .set("Authorization", "Bearer " + userJWTtoken);
@@ -104,6 +106,8 @@ describe("GET /watchlist?price", () => {
     await createWatchListFor("AAPL", "super");
     await createWatchListFor("FB", "user");
     await createWatchListFor("MSFT", "user");
+
+    console.debug('test setup done.');
 
     const response = await request
       .get("/watchlist?price")
