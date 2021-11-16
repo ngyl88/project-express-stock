@@ -7,6 +7,9 @@ The REST API allows user to maintain a watchlist on the stock market and users w
 * Query of latest transaction information for stocks on watchlist
 * Token Expiration within 30 minutes
 
+## Build Status
+[![CircleCI](https://circleci.com/gh/ngyl88/project-express-stock/tree/master.svg?style=svg)](https://circleci.com/gh/ngyl88/project-express-stock/tree/master)
+
 ## Documentation
 - [API documentation](https://express-stock-30545.herokuapp.com/api-docs/)
 

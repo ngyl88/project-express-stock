@@ -8,6 +8,5 @@ router.use(express.json());
 router.get("/", externalService.queryAlphaVantage);
 
 module.exports = app => {
-  app.use("/watchlist", passport.authenticate, router);
-  app.get("/wrapper", externalService.queryAlphaVantage);
+  app.use("/wrapper", externalService.queryAlphaVantage);
 };
