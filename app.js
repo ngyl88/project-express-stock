@@ -9,14 +9,15 @@ const errorHandler = require("./middleware/errorHandler");
 const logger = require("morgan");
 
 const mongoose = require("mongoose");
-if(process.env.NODE_ENV != "test") {
-  mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+if (process.env.NODE_ENV != "test") {
+  mongoose
+    .connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
+    .then(() => console.log('DB connected!'))
+    .catch((err) => console.error('DB not connected :(', err));
 }
-
-const db = mongoose.connection;
-db.on("error", error =>
-  console.error("An error occured in DB connection!", error)
-);
 
 const indexRouter = require("./routes/index");
 const userRouter = require("./routes/users");
