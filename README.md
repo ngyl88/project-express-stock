@@ -16,7 +16,7 @@ The REST API allows user to maintain a watchlist on the stock market and users w
 - [Mongo DB](https://www.mongodb.com/) - The database
 - [Mongoose](http://mongoosejs.com/) - MongoDB object modeling
 - [PassportJS](http://www.passportjs.org/) - Authentication Middleware
-- [World Trading Data](https://www.worldtradingdata.com/) - The worldwide market data provider
+- [marketstack](https://marketstack.com) - The market data provider
 
 ## Getting Started
 
@@ -26,7 +26,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 You will need to install [MongoDB](https://www.mongodb.com/download-center) and start your DB server.
 
-You will need to acquire a free API key from [World Trading Data](https://www.worldtradingdata.com/).
+You will need to acquire a free API key from [marketstack](https://marketstack.com) .
 
 You can test the API behaviour by using web service testing application.
 - [Insomnia REST Client](https://insomnia.rest/)

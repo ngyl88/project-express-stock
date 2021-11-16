@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const axios = require("axios");
-axios.defaults.baseURL = "https://www.worldtradingdata.com/api/v1";
+axios.defaults.baseURL = "http://api.marketstack.com/v1";
 axios.defaults.timeout = 3000;
 
 const errors = require("../config/errors");
@@ -30,19 +30,17 @@ const processPriceDataFromAPI = (tickers, apiResponse) => {
     stock_information: [],
     unavailable_tickers: []
   };
-  if (apiResponse["symbols_requested"] !== apiResponse["symbols_returned"]) {
-    response.unavailable_tickers = getUnvailableTickers(tickers, apiResponse);
-  }
+  response.unavailable_tickers = getUnvailableTickers(tickers, apiResponse);
   response.stock_information = transformData(apiResponse.data);
   return response;
 };
 const getPriceFromAPI = async tickers => {
   let data = [];
   try {
-    const response = await axios.get("/stock", {
+    const response = await axios.get("/eod/latest", {
       params: {
-        symbol: tickers,
-        api_token: process.env.API_KEY_WORLD_TRADING_DATA
+        symbols: tickers,
+        access_key: process.env.API_KEY_WORLD_TRADING_DATA
       }
     });
     data = response.data;
