@@ -3,15 +3,11 @@ const express = require("express");
 const passport = require("../config/passport");
 const errorHandler = require("../middleware/errorHandler");
 
-const externalService = require("../middleware/externalService");
-
 const watchlistMiddleware = require("../middleware/watchlist");
 const watchlistService = require("../middleware/watchlistService");
 
 const router = express.Router();
 router.use(express.json());
-
-router.get("/wrapper", externalService.queryAlphaVantage);
 
 router.get("/", watchlistService.getWatchList);
 

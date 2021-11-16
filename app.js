@@ -20,6 +20,7 @@ if (process.env.NODE_ENV != "test") {
 }
 
 const indexRouter = require("./routes/index");
+const wrapperRouter = require("./routes/wrapper");
 const userRouter = require("./routes/users");
 const watchlistRouter = require("./routes/watchlists");
 
@@ -40,6 +41,7 @@ app.use("/secret", passport.authenticate,
 );
 
 indexRouter(app);
+wrapperRouter(app);
 userRouter(app);
 watchlistRouter(app);
 
