@@ -17,13 +17,16 @@ let userJWTtoken = "";
 beforeAll(async () => {
   jest.setTimeout(10000);
 
-  const uri = await mongod.getConnectionString();
-  await mongoose.connect(uri, { useNewUrlParser: true });
+  const uri = await mongod.getUri();
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 });
 
 beforeEach(async () => {
   mongoose.connection.db.dropDatabase();
-  
+
   await signup("super", "super");
   superJWTtoken = await signin("super", "super");
   await signup("user", "user");

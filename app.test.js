@@ -9,8 +9,11 @@ const request = supertest(app);
 beforeAll(async () => {
   jest.setTimeout(10000);
 
-  const uri = await mongod.getConnectionString();
-  await mongoose.connect(uri);
+  const uri = await mongod.getUri();
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 });
 
 beforeEach(async () => {

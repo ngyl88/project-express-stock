@@ -18,8 +18,11 @@ let userJWTtoken = "";
 beforeAll(async () => {
   jest.setTimeout(60000);
 
-  const uri = await mongod.getConnectionString();
-  await mongoose.connect(uri, { useNewUrlParser: true });
+  const uri = await mongod.getUri();
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 });
 
 beforeEach(async () => {
