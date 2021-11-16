@@ -36,5 +36,10 @@
     "jest": "^23.4.1",
     "mongodb-memory-server": "^1.9.0",
     "supertest": "^3.1.0"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "platform": "darwin"
+    }
   }
 }
