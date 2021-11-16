@@ -48,10 +48,12 @@ Run the following to trigger the tests.
 npm test
 ```
 
-Set your API key. Start the local server and test on the listening port.
+Set up `.env` or `.envrc`. Start the local server and test on the listening port.
 
 ```
-API_KEY_WORLD_TRADING_DATA=<YOUR_API_KEY> node server.js
+API_KEY_WORLD_TRADING_DATA=<YOUR_MARKETSTACK_API_KEY>
+JWT_SECRET=
+MONGODB_URI=
 ```
 
 ## Versioning

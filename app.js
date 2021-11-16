@@ -9,7 +9,9 @@ const errorHandler = require("./middleware/errorHandler");
 const logger = require("morgan");
 
 const mongoose = require("mongoose");
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+if(process.env.NODE_ENV != "test") {
+  mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+}
 
 const db = mongoose.connection;
 db.on("error", error =>

@@ -10,7 +10,7 @@
     "start": "node server.js",
     "start:dev": "npx nodemon server.js",
     "start:prod": "NODE_ENV=production npx nodemon server.js",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:watch:silent": "jest --watch --silent",
     "test:coverage": "jest --coverage",
