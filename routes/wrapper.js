@@ -11,11 +11,11 @@ const corsOptions = {
 const externalService = require("../middleware/externalService");
 
 const router = express.Router();
-router.use(cors())
+router.use(cors(corsOptions));
 router.use(express.json());
 
-router.get("/", cors(corsOptions), externalService.queryAlphaVantage);
+router.get("/", externalService.queryAlphaVantage);
 
 module.exports = app => {
-  app.use("/wrapper", externalService.queryAlphaVantage);
+  app.use("/wrapper", router);
 };
